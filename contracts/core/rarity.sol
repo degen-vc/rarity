@@ -976,6 +976,9 @@ contract rarity is ERC721Enumerable {
         }
     }
 
+    // return image by user class (in separate contract), 
+    // TODO check https://opensea.io/assets/0x2d0ee46b804f415be4dc8aa1040834f5125ebd2e/5496
+    // TODO check https://testnets.opensea.io/assets/0x7dca125b1e805dc88814aed7ccc810f677d3e1db/25
     function tokenURI(uint256 _summoner) public view override returns (string memory) {
         string[7] memory parts;
         parts[0] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="10" y="20" class="base">';
