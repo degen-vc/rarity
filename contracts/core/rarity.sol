@@ -921,9 +921,6 @@ contract rarity is ERC721Enumerable {
     uint constant xp_per_day = 250e18;
     uint constant DAY = 1 days;
 
-    // string constant public name = "Scarcity Manifested";
-    // string constant public symbol = "SM";
-
     mapping(uint => uint) public xp;
     mapping(uint => uint) public adventurers_log;
     mapping(uint => uint) public class;
@@ -931,30 +928,28 @@ contract rarity is ERC721Enumerable {
 
     event summoned(address indexed owner, uint class, uint summoner);
     event leveled(address indexed owner, uint level, uint summoner);
-    
-    constructor() ERC721("Scarcity Manifested", "SM") {
-        
-    }
+
+    constructor() ERC721("Scarcity Manifested", "SM") {}
 
     function adventure(uint _summoner) external {
-        require(_isApprovedOrOwner(msg.sender, _summoner));
+        require(_isApprovedOrOwner(_msgSender(), _summoner));
         require(block.timestamp > adventurers_log[_summoner]);
         adventurers_log[_summoner] = block.timestamp + DAY;
         xp[_summoner] += xp_per_day;
     }
 
     function spend_xp(uint _summoner, uint _xp) external {
-        require(_isApprovedOrOwner(msg.sender, _summoner));
+        require(_isApprovedOrOwner(_msgSender(), _summoner));
         xp[_summoner] -= _xp;
     }
 
     function level_up(uint _summoner) external {
-        require(_isApprovedOrOwner(msg.sender, _summoner));
+        require(_isApprovedOrOwner(_msgSender(), _summoner));
         uint _level = level[_summoner];
         uint _xp_required = xp_required(_level);
         xp[_summoner] -= _xp_required;
         level[_summoner] = _level+1;
-        emit leveled(msg.sender, level[_summoner], _summoner);
+        emit leveled(_msgSender(), level[_summoner], _summoner);
     }
 
     function summoner(uint _summoner) external view returns (uint _xp, uint _log, uint _class, uint _level) {
@@ -969,8 +964,8 @@ contract rarity is ERC721Enumerable {
         uint _next_summoner = next_summoner;
         class[_next_summoner] = _class;
         level[_next_summoner] = 1;
-        _safeMint(msg.sender, _next_summoner);
-        emit summoned(msg.sender, _class, _next_summoner);
+        _safeMint(_msgSender(), _next_summoner);
+        emit summoned(_msgSender(), _class, _next_summoner);
         next_summoner++;
     }
 
