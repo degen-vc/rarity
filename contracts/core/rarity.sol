@@ -919,6 +919,7 @@ contract rarity  is Ownable, ERC721Enumerable {
     mapping(uint => uint) public adventurers_log;
     mapping(uint => uint) public class;
     mapping(uint => uint) public level;
+    mapping(uint => address) public minters;
 
     event summoned(address indexed owner, uint class, uint summoner);
     event leveled(address indexed owner, uint level, uint summoner);
@@ -966,6 +967,7 @@ contract rarity  is Ownable, ERC721Enumerable {
         uint _next_summoner = next_summoner;
         class[_next_summoner] = _class;
         level[_next_summoner] = 1;
+        minters[_next_summoner] = _msgSender(); 
         _safeMint(_msgSender(), _next_summoner);
         emit summoned(_msgSender(), _class, _next_summoner);
         next_summoner++;

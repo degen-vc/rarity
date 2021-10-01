@@ -486,6 +486,7 @@ contract rarity_crafting is Ownable, ERC721Enumerable {
         uint8 item_type;
         uint32 crafted;
         uint crafter;
+        address minters;
     }
 
     function setBaseMetadataURI(string memory _newBaseMetadataURI) external onlyOwner {
@@ -594,7 +595,7 @@ contract rarity_crafting is Ownable, ERC721Enumerable {
         if (crafted) {
             uint _cost = get_item_cost(_base_type, _item_type);
             require(_gold.transferFrom(SUMMMONER_ID, _summoner, SUMMMONER_ID, _cost), "!gold");
-            items[next_item] = item(_base_type, _item_type, uint32(block.timestamp), _summoner);
+            items[next_item] = item(_base_type, _item_type, uint32(block.timestamp), _summoner, msg.sender);
             _safeMint(msg.sender, next_item);
             emit Crafted(msg.sender, uint(check), _summoner, _base_type, _item_type, _cost, _crafting_materials);
             next_item++;
