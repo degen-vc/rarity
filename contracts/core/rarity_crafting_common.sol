@@ -458,17 +458,17 @@ contract rarity_crafting is Ownable, ERC721Enumerable {
     uint public next_item;
     uint constant craft_xp_per_day = 250e18;
 
-    rarity constant _rm = rarity(0x4fb729BDb96d735692DCACD9640cF7e3aA859B25);
-    rarity_attributes constant _attr = rarity_attributes(0x3a7c6a0E65480EB32A0ddf1cC2db6563Aaed03ce);
-    rarity_crafting_materials_i constant _craft_i = rarity_crafting_materials_i(0xEF4C8E18c831cB7C937A0D17809102208570eC8F);
-    rarity_gold constant _gold = rarity_gold(0x7303E7a860DAFfE4d0b33615479648cb3496903b);
-    rarity_skills constant _skills = rarity_skills(0xf740103f4eDB85609292472048Dc823b5417D9a6);
+    rarity immutable _rm;
+    rarity_attributes immutable _attr;
+    rarity_crafting_materials_i immutable _craft_i;
+    rarity_gold immutable _gold;
+    rarity_skills immutable _skills;
 
-    codex_base_random constant _random = codex_base_random(0x101682Aca42c7793a83596d20dbB77F4782e2ecA);
-    codex_items_goods constant _goods = codex_items_goods(0xc36400d5EB01dB28EceA220CA1cc9cA7b97171ad);
-    codex_items_armor constant _armor = codex_items_armor(0x4976373A1528476b252451E2E096269b8B4De1Cf);
-    codex_items_weapons constant _weapons = codex_items_weapons(0xa6E9b54C99545623D0827Be9A786EdeD9b23Bf62);
-
+    codex_base_random immutable _random;
+    codex_items_goods immutable _goods;
+    codex_items_armor immutable _armor;
+    codex_items_weapons immutable _weapons;
+    
     string constant public name = "Scarcity Crafting (I)";
     string constant public symbol = "SC(I)";
 
@@ -476,9 +476,30 @@ contract rarity_crafting is Ownable, ERC721Enumerable {
 
     uint public immutable SUMMMONER_ID;
 
-    constructor() {
-        SUMMMONER_ID = _rm.next_summoner();
-        _rm.summon(11);
+    constructor(
+        rarity _rarity, 
+        rarity_attributes _rarity_attributes, 
+        rarity_crafting_materials_i _rarity_crafting_materials_i, 
+        rarity_gold _rarity_gold, 
+        rarity_skills _rarity_skills, 
+        codex_base_random _codex_base_random,
+        codex_items_goods _codex_items_goods,
+        codex_items_armor _codex_items_armor, 
+        codex_items_weapons _codex_items_weapons
+    ) {
+        SUMMMONER_ID = _rarity.next_summoner();
+        _rarity.summon(11);
+
+        _rm = _rarity;
+        _attr = _rarity_attributes;
+        _craft_i = _rarity_crafting_materials_i;
+        _gold = _rarity_gold;
+        _skills = _rarity_skills;
+
+        _random = _codex_base_random;
+        _goods = _codex_items_goods;
+        _armor = _codex_items_armor;
+        _weapons = _codex_items_weapons;
     }
 
     struct item {
@@ -486,7 +507,7 @@ contract rarity_crafting is Ownable, ERC721Enumerable {
         uint8 item_type;
         uint32 crafted;
         uint crafter;
-        address minters;
+        address minter;
     }
 
     function setBaseMetadataURI(string memory _newBaseMetadataURI) external onlyOwner {
@@ -501,12 +522,12 @@ contract rarity_crafting is Ownable, ERC721Enumerable {
         return 20;
     }
 
-    function get_armor_dc(uint _item_id) public pure returns (uint dc) {
+    function get_armor_dc(uint _item_id) public view returns (uint dc) {
         (,,,,uint _armor_bonus,,,,,) = _armor.item_by_id(_item_id);
         return 20 + _armor_bonus;
     }
 
-    function get_weapon_dc(uint _item_id) public pure returns (uint dc) {
+    function get_weapon_dc(uint _item_id) public view returns (uint dc) {
         codex_items_weapons.weapon memory _weapon = _weapons.item_by_id(_item_id);
         if (_weapon.proficiency == 1) {
             return 20;
@@ -517,7 +538,7 @@ contract rarity_crafting is Ownable, ERC721Enumerable {
         }
     }
 
-    function get_dc(uint _base_type, uint _item_id) public pure returns (uint dc) {
+    function get_dc(uint _base_type, uint _item_id) public view returns (uint dc) {
         if (_base_type == 1) {
             return get_goods_dc();
         } else if (_base_type == 2) {
@@ -527,7 +548,7 @@ contract rarity_crafting is Ownable, ERC721Enumerable {
         }
     }
 
-    function get_item_cost(uint _base_type, uint _item_type) public pure returns (uint cost) {
+    function get_item_cost(uint _base_type, uint _item_type) public view returns (uint cost) {
         if (_base_type == 1) {
             (,cost,,,) = _goods.item_by_id(_item_type);
         } else if (_base_type == 2) {

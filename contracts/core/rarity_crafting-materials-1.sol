@@ -147,8 +147,8 @@ contract rarity_crafting_materials {
 
     uint public totalSupply = 0;
 
-    rarity constant rm = rarity(0x4fb729BDb96d735692DCACD9640cF7e3aA859B25);
-    attributes constant _attr = attributes(0x3a7c6a0E65480EB32A0ddf1cC2db6563Aaed03ce);
+    rarity immutable rm ;
+    attributes immutable _attr;
 
     mapping(uint => mapping (uint => uint)) public allowance;
     mapping(uint => uint) public balanceOf;
@@ -158,6 +158,10 @@ contract rarity_crafting_materials {
     event Transfer(uint indexed from, uint indexed to, uint amount);
     event Approval(uint indexed from, uint indexed to, uint amount);
 
+    constructor(rarity _rarity, attributes _attributes) {
+        rm = _rarity;
+        _attr = _attributes;
+    }
 
     function _isApprovedOrOwner(uint _summoner) internal view returns (bool) {
         return rm.getApproved(_summoner) == msg.sender || rm.ownerOf(_summoner) == msg.sender;

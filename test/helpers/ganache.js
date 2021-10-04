@@ -15,6 +15,10 @@ class Ganache {
   async setTime(timestamp) {
     await network.provider.send('evm_mine', [timestamp]);
   }
+
+  async increaseTime(time) {
+    await network.provider.send('evm_increaseTime', [time]);
+  }
 }
 
 module.exports = Ganache;

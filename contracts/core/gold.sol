@@ -14,7 +14,7 @@ contract rarity_gold {
 
     uint public totalSupply = 0;
 
-    rarity constant rm = rarity(0x4fb729BDb96d735692DCACD9640cF7e3aA859B25);
+    rarity immutable rm;
 
     mapping(uint => mapping (uint => uint)) public allowance;
     mapping(uint => uint) public balanceOf;
@@ -23,6 +23,10 @@ contract rarity_gold {
 
     event Transfer(uint indexed from, uint indexed to, uint amount);
     event Approval(uint indexed from, uint indexed to, uint amount);
+
+    constructor(rarity _rarity) {
+        rm = _rarity;
+    }
 
     function wealth_by_level(uint level) public pure returns (uint wealth) {
         for (uint i = 1; i < level; i++) {
