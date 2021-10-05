@@ -8,7 +8,7 @@ describe('Scarcity', function() {
   let accounts;
   let owner;
   let user;
-  let reciever;
+  let receiver;
   
   let scarcity;
 
@@ -16,7 +16,7 @@ describe('Scarcity', function() {
     accounts = await ethers.getSigners();
     owner = accounts[0];
     user = accounts[1];
-    reciever = accounts[2];
+    receiver = accounts[2];
 
     const Scarcity = await ethers.getContractFactory('contracts/core/rarity.sol:rarity');
     scarcity = await Scarcity.deploy();
@@ -67,8 +67,8 @@ describe('Scarcity', function() {
 
   it('should NOT change minter address after transfer', async ()=> {
     await scarcity.connect(user).summon(1);
-    await scarcity.connect(user).transferFrom(user.address, reciever.address, 0);
-    expect(await scarcity.ownerOf(0)).to.equal(reciever.address);
+    await scarcity.connect(user).transferFrom(user.address, receiver.address, 0);
+    expect(await scarcity.ownerOf(0)).to.equal(receiver.address);
     expect(await scarcity.minters(0)).to.equal(user.address);
   });
 });

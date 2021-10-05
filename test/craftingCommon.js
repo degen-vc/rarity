@@ -8,7 +8,7 @@ describe('craftingCommon', function() {
   let accounts;
   let owner;
   let user;
-  let reciever;
+  let receiver;
   let summon_id;
 
   let scarcity;
@@ -17,7 +17,7 @@ describe('craftingCommon', function() {
     accounts = await ethers.getSigners();
     owner = accounts[0];
     user = accounts[1];
-    reciever = accounts[2];
+    receiver = accounts[2];
     
     const Scarcity = await ethers.getContractFactory('contracts/core/rarity.sol:rarity');
     scarcity = await Scarcity.deploy();
@@ -106,8 +106,8 @@ describe('craftingCommon', function() {
       await ganache.increaseTime(24*60*60 + 1);
     } while(bal < 1);
 
-    await crafting.connect(user).transferFrom(user.address, reciever.address, 0);
-    expect(await crafting.ownerOf(0)).to.equal(reciever.address);
+    await crafting.connect(user).transferFrom(user.address, receiver.address, 0);
+    expect(await crafting.ownerOf(0)).to.equal(receiver.address);
     expect((await crafting.items(0)).minter).to.equal(user.address);
   });
 
