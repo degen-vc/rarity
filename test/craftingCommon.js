@@ -79,6 +79,8 @@ describe('craftingCommon', function() {
 
     await gold.connect(user).approve(summon_id, 0, balanceOfSummon);
     await scarcity.connect(user).approve(crafting.address, summon_id);
+
+    attempt = 0;
   
     do {
       await scarcity.connect(user).adventure(summon_id);
@@ -86,7 +88,8 @@ describe('craftingCommon', function() {
       bal = await crafting.balanceOf(user.address);
 
       await ganache.increaseTime(24*60*60 + 1);
-    } while(bal < 1);
+      attempt++;
+    } while(bal < 1 && attempt < 100);
 
     expect(await crafting.balanceOf(user.address)).to.equal(1);
   });
@@ -98,13 +101,16 @@ describe('craftingCommon', function() {
     await gold.connect(user).approve(summon_id, 0, balanceOfSummon);
     await scarcity.connect(user).approve(crafting.address, summon_id);
   
+    attempt = 0;
+  
     do {
       await scarcity.connect(user).adventure(summon_id);
       await crafting.connect(user).craft(summon_id, 1, 1, 0);
       bal = await crafting.balanceOf(user.address);
 
       await ganache.increaseTime(24*60*60 + 1);
-    } while(bal < 1);
+      attempt++;
+    } while(bal < 1 && attempt < 100);
 
     await crafting.connect(user).transferFrom(user.address, receiver.address, 0);
     expect(await crafting.ownerOf(0)).to.equal(receiver.address);
