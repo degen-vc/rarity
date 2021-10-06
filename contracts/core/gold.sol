@@ -1,19 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 interface rarity {
     function level(uint) external view returns (uint);
     function getApproved(uint) external view returns (address);
     function ownerOf(uint) external view returns (address);
 }
 
-contract rarity_gold {
+contract rarity_gold is Ownable {
     string public constant name = "Scarcity Gold";
     string public constant symbol = "SGOLD";
     uint8 public constant decimals = 18;
 
     uint public totalSupply = 0;
 
+    uint8 public formulaModifier;
+    
     rarity immutable rm;
 
     mapping(uint => mapping (uint => uint)) public allowance;
@@ -28,9 +32,12 @@ contract rarity_gold {
         rm = _rarity;
     }
 
-    function wealth_by_level(uint level) public pure returns (uint wealth) {
-        for (uint i = 1; i < level; i++) {
-            wealth += i * 1000e18;
+    function wealth_by_level(uint level) public view returns (uint wealth) {
+        if (formulaModifier > 1 && level > 1) return 1000e18;
+        if (level > 22 && formulaModifier == 1) return 0;
+        for (uint256 i = 1; i < level; i++) {
+            wealth += (i * 1000e18) - (formulaModifier * (level - 2) * 50e18);
+            if (formulaModifier > 0) return wealth;
         }
     }
 
@@ -100,4 +107,10 @@ contract rarity_gold {
 
         emit Transfer(from, to, amount);
     }
+        
+    // @dev Change formula modifier to variate gold emission. 0 for standard formula, 1 for decreasing and >1 for static emission
+    function updateFormulaModifier(uint8 _formulaModifier) external onlyOwner {
+        formulaModifier = _formulaModifier;
+    }
+
 }
