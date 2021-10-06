@@ -2,7 +2,7 @@ const Ganache = require('./helpers/ganache');
 const { expect } = require('chai');
 const { utils } = require('ethers');
 
-describe('Scarcity', function() {
+describe('Gold', function() {
   const ganache = new Ganache();
 
   let accounts;
@@ -103,7 +103,7 @@ describe('Scarcity', function() {
     await gold.connect(owner).updateFormulaModifier(0);
     expect(await gold.wealth_by_level(25)).to.equal(utils.parseEther('300000'));
   });
-  
+
   it('should return 0 wealth on 25 level and modifier 1', async ()=>{
     await gold.connect(owner).updateFormulaModifier(1);
     expect(await gold.wealth_by_level(25)).to.equal(utils.parseEther('0'));

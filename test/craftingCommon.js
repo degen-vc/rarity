@@ -2,7 +2,7 @@ const Ganache = require('./helpers/ganache');
 const { expect, use } = require('chai');
 const { utils } = require('ethers');
 
-describe('craftingCommon', function() {
+describe('CraftingCommon', function() {
   const ganache = new Ganache();
 
   let accounts;
