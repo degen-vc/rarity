@@ -325,12 +325,28 @@ interface rarity_item1 is IERC721Enumerable {
 contract rarity_library {
     using Strings for uint;
 
-    rarity_manifested constant _rm = rarity_manifested(0x4fb729BDb96d735692DCACD9640cF7e3aA859B25);
-    rarity_attributes public   _attr = rarity_attributes(0x3a7c6a0E65480EB32A0ddf1cC2db6563Aaed03ce);
-    rarity_skills public       _skills = rarity_skills(0xf740103f4eDB85609292472048Dc823b5417D9a6);
-    rarity_gold public         _gold = rarity_gold(0x7303E7a860DAFfE4d0b33615479648cb3496903b);
-    rarity_mat1 public         _mat1 = rarity_mat1(0xEF4C8E18c831cB7C937A0D17809102208570eC8F);
-    rarity_item1 public        _items1 = rarity_item1(0x7d022B9b34eaDC5E7507823EDe459347220EdA5D);
+    rarity_manifested immutable _rm;
+    rarity_attributes immutable _attr;
+    rarity_skills immutable _skills;
+    rarity_gold immutable _gold;
+    rarity_mat1 immutable _mat1;
+    rarity_item1 immutable _items1;
+
+    constructor(
+        rarity_manifested _rarity_manifested,
+        rarity_attributes _rarity_attributes,
+        rarity_skills _rarity_skills,
+        rarity_gold _rarity_gold,
+        rarity_mat1 _rarity_mat1,
+        rarity_item1 _rarity_item1
+        ) {
+        _rm = _rarity_manifested;
+        _attr = _rarity_attributes;
+        _skills = _rarity_skills;
+        _gold = _rarity_gold;
+        _mat1 = _rarity_mat1;
+        _items1 = _rarity_item1;
+    }
 
     function base(uint _s) public view returns (rl._base memory c) {
         (uint _xp, uint _log, uint _class, uint _level) = _rm.summoner(_s);
