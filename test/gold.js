@@ -114,4 +114,19 @@ describe('Gold', function() {
     expect(await gold.wealth_by_level(25)).to.equal(utils.parseEther('1000'));
   });
 
+  it('should return non-zero wealth on 9999 level and modifier 0', async ()=>{
+    await gold.connect(owner).updateFormulaModifier(0);
+    expect(await gold.wealth_by_level(9999)).to.not.equal(utils.parseEther('0'));
+  });
+
+  it('should return 0 wealth on 999999999 level and modifier 1', async ()=>{
+    await gold.connect(owner).updateFormulaModifier(1);
+    expect(await gold.wealth_by_level(999999999)).to.equal(utils.parseEther('0'));
+  });
+
+  it('should return 1000 wealth on 10000000000 level and modifier 255', async ()=>{
+    await gold.connect(owner).updateFormulaModifier(255);
+    expect(await gold.wealth_by_level(10000000000)).to.equal(utils.parseEther('1000'));
+  });
+
 });
