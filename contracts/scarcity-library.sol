@@ -182,8 +182,24 @@ interface IERC721Enumerable is IERC721 {
     function tokenByIndex(uint256 index) external view returns (uint256);
 }
 
-
 library rl {
+    struct _service_data {
+        uint goldBalance;
+        uint xp;
+        string class;
+        uint level;
+        bool transferred;
+        bool hasName;
+        uint8[36] current_skills;
+        bool[36] class_skills;
+        uint32 _str; 
+        uint32 _dex; 
+        uint32 _con; 
+        uint32 _int; 
+        uint32 _wis; 
+        uint32 _cha;
+    }
+
     struct _base {
         uint xp;
         uint log;
@@ -275,6 +291,7 @@ interface adventurable {
 interface rarity_manifested is IERC721, adventurable {
     function summoner(uint _summoner) external view returns (uint _xp, uint _log, uint _class, uint _level);
     function level(uint) external view returns (uint);
+    function minters(uint) external view returns (address);
     function class(uint) external view returns (uint);
     function classes(uint) external pure returns (string memory);
     function level_up(uint _summoner) external;
@@ -321,6 +338,9 @@ interface rarity_item1 is IERC721Enumerable {
     function items(uint) external view returns (uint8, uint8, uint32, uint);
 }
 
+interface rarity_names is IERC721Enumerable {
+    function summoner_to_name_id(uint _summoner) external view returns (uint id);
+}
 
 contract rarity_library {
     using Strings for uint;
@@ -331,6 +351,7 @@ contract rarity_library {
     rarity_gold immutable _gold;
     rarity_mat1 immutable _mat1;
     rarity_item1 immutable _items1;
+    rarity_names immutable _names;
 
     constructor(
         rarity_manifested _rarity_manifested,
@@ -338,7 +359,8 @@ contract rarity_library {
         rarity_skills _rarity_skills,
         rarity_gold _rarity_gold,
         rarity_mat1 _rarity_mat1,
-        rarity_item1 _rarity_item1
+        rarity_item1 _rarity_item1,
+        rarity_names _rarity_names
         ) {
         _rm = _rarity_manifested;
         _attr = _rarity_attributes;
@@ -346,6 +368,7 @@ contract rarity_library {
         _gold = _rarity_gold;
         _mat1 = _rarity_mat1;
         _items1 = _rarity_item1;
+        _names = _rarity_names;
     }
 
     function base(uint _s) public view returns (rl._base memory c) {
@@ -383,7 +406,6 @@ contract rarity_library {
         );
     }
 
-
     function _pb(uint score) internal pure returns (uint) {
         if (score < 8) {
             return 0;
@@ -402,8 +424,6 @@ contract rarity_library {
         bool character_created = _attr.character_created(_s);
         scores_full = rl._ability_scores_full(scores, modifiers, total_points, spent_points, character_created);
     }
-
-
 
     function skills(uint _s) public view returns (rl._skills memory s) {
         uint8[36] memory _current_skills = _skills.get_skills(_s);
@@ -478,6 +498,43 @@ contract rarity_library {
             (uint8 _base_type, uint8 _item_type, uint32 _crafted, uint _crafter) = _items1.items(_items1.tokenOfOwnerByIndex(_owner, i));
             items[i] = rl._item1(_base_type, _item_type, _crafted, _crafter);
         }
+    }
+
+    function baseInfo(uint _s) public view returns(uint _xp, string memory _class, uint _level) {
+        uint class;
+       (_xp,, class, _level) = _rm.summoner(_s);
+       _class = _rm.classes(class);
+    }
+
+    function isTransferred(uint _s) public view returns(bool _transferred) {
+        address _minter = _rm.minters(_s);
+        address _owner = _rm.ownerOf(_s);
+        if (_owner != _minter) {
+            return true;
+        } 
+    }
+
+    function hasName(uint _s) public view returns(bool _assigned) {
+        if (_names.summoner_to_name_id(_s) > 0) {
+            return true;
+        }
+    }
+
+    function currentAndClassSkills(uint _s) public view returns(uint8[36] memory _current_skills, bool[36] memory _class_skills) {
+        _current_skills = _skills.get_skills(_s);
+        (,, uint _class,) = _rm.summoner(_s);
+        _class_skills = _skills.class_skills(_class);
+    }
+
+    function serviceData(uint _s) public view returns (rl._service_data memory data) {
+        data.goldBalance = _gold.balanceOf(_s);
+        
+        (data.xp, data.class, data.level) = baseInfo(_s);
+        data.transferred = isTransferred(_s);
+        data.hasName = hasName(_s);
+        (data.current_skills, data.class_skills) =  currentAndClassSkills(_s);
+
+        (data._str, data._dex, data._con, data._int, data._wis, data._cha) = _attr.ability_scores(_s);
     }
 }
 

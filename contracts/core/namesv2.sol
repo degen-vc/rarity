@@ -435,6 +435,8 @@ interface rarity_manifested {
     function level(uint) external view returns (uint);
     function class(uint) external view returns (uint);
     function classes(uint id) external pure returns (string memory);
+    function next_summoner() external view returns (uint);
+    function summon(uint _class) external;
 }
 
 // Part: ERC165
@@ -1214,11 +1216,11 @@ abstract contract ERC721Enumerable is ERC721, IERC721Enumerable {
 contract rarity_names is ERC721Enumerable {
     uint private next_name = 1;
 
-    rarity_manifested constant _rm = rarity_manifested(0xce761D788DF608BD21bdd59d6f4B54b2e27F25Bb);
-    rarity_gold constant _gold = rarity_gold(0x2069B76Afe6b734Fb65D1d099E7ec64ee9CC76B2);
+    rarity_manifested immutable _rm;
+    rarity_gold immutable _gold;
 
-    uint public immutable NAME_AUTHORITY = 1672924;
-    uint public immutable KEEPER = 1672965;
+    uint public immutable KEEPER_ID;
+    uint public immutable EXECUTOR_ID;
     uint public immutable NAME_GOLD_PRICE = 200e18;
 
     mapping(uint => string) public names;  // token => name
@@ -1230,7 +1232,13 @@ contract rarity_names is ERC721Enumerable {
     event NameUpdated(uint indexed name_id, string old_name, string new_name);
     event NameAssigned(uint indexed name_id, uint indexed previous_summoner, uint indexed new_summoner);
 
-    constructor() ERC721("Rarity Names", "names") {
+    constructor(rarity_manifested _rarity, rarity_gold _rarity_gold, uint _keeper_id) ERC721("Rarity Names", "names") {
+        KEEPER_ID = _keeper_id;
+        EXECUTOR_ID = _rarity.next_summoner();
+        _rarity.summon(11);
+
+        _rm = _rarity;
+        _gold = _rarity_gold;
     }
 
     function _isApprovedOrOwner(uint _summoner) internal view returns (bool) {
@@ -1251,7 +1259,7 @@ contract rarity_names is ERC721Enumerable {
         require(validate_name(name), 'invalid name');
         string memory lower_name = to_lower(name);
         require(!_is_name_claimed[lower_name], 'name taken');
-        _gold.transferFrom(NAME_AUTHORITY, summoner, KEEPER, NAME_GOLD_PRICE);
+        _gold.transferFrom(EXECUTOR_ID, summoner, KEEPER_ID, NAME_GOLD_PRICE);
         _mint(msg.sender, next_name);
         name_id = next_name;
         next_name++;
