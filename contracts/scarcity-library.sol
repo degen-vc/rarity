@@ -509,15 +509,11 @@ contract rarity_library {
     function isTransferred(uint _s) public view returns(bool _transferred) {
         address _minter = _rm.minters(_s);
         address _owner = _rm.ownerOf(_s);
-        if (_owner != _minter) {
-            return true;
-        } 
+        return _owner != _minter;
     }
 
     function hasName(uint _s) public view returns(bool _assigned) {
-        if (_names.summoner_to_name_id(_s) > 0) {
-            return true;
-        }
+        return _names.summoner_to_name_id(_s) > 0;
     }
 
     function currentAndClassSkills(uint _s) public view returns(uint8[36] memory _current_skills, bool[36] memory _class_skills) {
