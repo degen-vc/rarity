@@ -1232,7 +1232,7 @@ contract rarity_names is ERC721Enumerable {
     event NameUpdated(uint indexed name_id, string old_name, string new_name);
     event NameAssigned(uint indexed name_id, uint indexed previous_summoner, uint indexed new_summoner);
 
-    constructor(rarity_manifested _rarity, rarity_gold _rarity_gold, uint _keeper_id) ERC721("Rarity Names", "names") {
+    constructor(rarity_manifested _rarity, rarity_gold _rarity_gold, uint _keeper_id) ERC721("Scarcity Names", "names") {
         KEEPER_ID = _keeper_id;
         EXECUTOR_ID = _rarity.next_summoner();
         _rarity.summon(11);
