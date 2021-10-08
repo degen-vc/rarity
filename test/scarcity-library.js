@@ -64,9 +64,30 @@ describe('scarcity-library', function() {
     names = await Names.deploy(scarcity.address, gold.address, names_keeper_id);
 
     const Library = await ethers.getContractFactory('contracts/scarcity-library.sol:rarity_library');
-    library = await Library.deploy(scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, names.address);
+    library = await Library.deploy(scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, names.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address);
 
     await ganache.snapshot();
+  });
+
+  beforeEach('setup crafter', async ()=> {
+    await scarcity.connect(user).summon(1);
+    summon_id = (await scarcity.next_summoner()) - 1;
+
+    for (let i = 0; i < 5; i++) {
+      await scarcity.connect(user).adventure(summon_id);
+      await ganache.increaseTime(24*60*60 + 1);
+    }
+
+    await scarcity.connect(user).level_up(summon_id);
+    await gold.connect(user).claim(summon_id);
+  
+    await attributes.connect(user).point_buy(summon_id, 8, 8, 8, 22, 8, 8);
+    await skills.connect(user).set_skills(summon_id, [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+ 
+    balanceOfSummon = await gold.balanceOf(summon_id);
+
+    await gold.connect(user).approve(summon_id, 0, balanceOfSummon);
+    await scarcity.connect(user).approve(crafting.address, summon_id);
   });
 
   afterEach('revert', function() { return ganache.revert(); });
@@ -74,7 +95,7 @@ describe('scarcity-library', function() {
   it('should return right service data for new summoner', async ()=> {
     await scarcity.connect(user).summon(1);
     summon_id = (await scarcity.next_summoner()) - 1;
-    data = await library.serviceData(summon_id);
+    data = await library.summonerServiceData(summon_id);
 
     expect(data.goldBalance).to.equal(utils.parseEther('0'));
     expect(data.xp).to.equal(0);
@@ -118,7 +139,7 @@ describe('scarcity-library', function() {
     await scarcity.connect(receiver).approve(names.address, summon_id);
     await names.connect(receiver).claim('testname', summon_id);    
 
-    data = await library.serviceData(summon_id);
+    data = await library.summonerServiceData(summon_id);
     expect(data.goldBalance).to.equal(utils.parseEther('800'));
     expect(data.xp).to.equal(utils.parseEther('250'));
     expect(data.class).to.equal('Paladin');
@@ -135,4 +156,105 @@ describe('scarcity-library', function() {
     expect(data._cha).to.equal(8);
   });
 
+  it('should return right service data for crafted item(goods)', async ()=> {
+    attempt = 0;
+    do {
+      await scarcity.connect(user).adventure(summon_id);
+      await crafting.connect(user).craft(summon_id, 1, 1, 0);
+      bal = await crafting.balanceOf(user.address);
+
+      await ganache.increaseTime(24*60*60 + 1);
+      attempt++;
+      if (attempt > 100) expect.fail("Too many craft attempts");
+    } while(bal < 1);
+
+    item_token_id = (await crafting.next_item()) - 1;
+    data = await library.itemServiceData(item_token_id);
+
+    expect(data.base_type).to.equal("Goods");
+    expect(data.item_type).to.equal(1);
+    expect(data.weight).to.equal(2);
+    expect(data.gold_cost).to.equal(utils.parseEther('1'));
+    expect(data.name).to.equal("Caltrops");
+    expect(data.description).to.equal("A caltrop is a four-pronged iron spike crafted so that one prong faces up no matter how the caltrop comes to rest. You scatter caltrops on the ground in the hope that your enemies step on them or are at least forced to slow down to avoid them. One 2-pound bag of caltrops covers an area 5 feet square.");
+    expect(data.proficiency).to.equal('');
+    expect(data.encumbrance).to.equal('');
+    expect(data.damage_type).to.equal('');
+    expect(data.damage).to.equal(0);
+    expect(data.critical).to.equal(0);
+    expect(data.critical_modifier).to.equal(0);
+    expect(data.range_increment).to.equal(0);
+    expect(data.armor_bonus).to.equal(0);
+    expect(data.max_dex_bonus).to.equal(0);
+    expect(data.penalty).to.equal(0);
+    expect(data.spell_failure).to.equal(0);
+  });
+
+  it('should return right service data for crafted item(armor)', async ()=> {
+    attempt = 0;
+    do {
+      await scarcity.connect(user).adventure(summon_id);
+      await crafting.connect(user).craft(summon_id, 2, 5, 0);
+      bal = await crafting.balanceOf(user.address);
+
+      await ganache.increaseTime(24*60*60 + 1);
+      attempt++;
+      if (attempt > 100) expect.fail("Too many craft attempts");
+    } while(bal < 1);
+
+    item_token_id = (await crafting.next_item()) - 1;
+    data = await library.itemServiceData(item_token_id);
+
+    expect(data.base_type).to.equal("Armor");
+    expect(data.item_type).to.equal(5);
+    expect(data.weight).to.equal(25);
+    expect(data.gold_cost).to.equal(utils.parseEther('15'));
+    expect(data.name).to.equal("Hide");
+    expect(data.description).to.equal('');
+    expect(data.proficiency).to.equal("Medium");
+    expect(data.encumbrance).to.equal('');
+    expect(data.damage_type).to.equal('');
+    expect(data.damage).to.equal(0);
+    expect(data.critical).to.equal(0);
+    expect(data.critical_modifier).to.equal(0);
+    expect(data.range_increment).to.equal(0);
+    expect(data.armor_bonus).to.equal(3);
+    expect(data.max_dex_bonus).to.equal(4);
+    expect(data.penalty).to.equal(-3);
+    expect(data.spell_failure).to.equal(20);
+  });
+
+  it('should return right service data for crafted item(weapon)', async ()=> {
+    attempt = 0;
+    do {
+      await scarcity.connect(user).adventure(summon_id);
+      await crafting.connect(user).craft(summon_id, 3, 13, 0);
+      bal = await crafting.balanceOf(user.address);
+
+      await ganache.increaseTime(24*60*60 + 1);
+      attempt++;
+      if (attempt > 100) expect.fail("Too many craft attempts");
+    } while(bal < 1);
+
+    item_token_id = (await crafting.next_item()) - 1;
+    data = await library.itemServiceData(item_token_id);
+
+    expect(data.base_type).to.equal("Weapons");
+    expect(data.item_type).to.equal(13);
+    expect(data.weight).to.equal(8);
+    expect(data.gold_cost).to.equal(utils.parseEther('50'));
+    expect(data.name).to.equal("Crossbow, heavy");
+    expect(data.description).to.equal("You draw a heavy crossbow back by turning a small winch. Loading a heavy crossbow is a full-round action that provokes attacks of opportunity.");
+    expect(data.proficiency).to.equal("Simple");
+    expect(data.encumbrance).to.equal("Ranged Weapons");
+    expect(data.damage_type).to.equal("Piercing");
+    expect(data.damage).to.equal(10);
+    expect(data.critical).to.equal(2);
+    expect(data.critical_modifier).to.equal(-1);
+    expect(data.range_increment).to.equal(120);
+    expect(data.armor_bonus).to.equal(0);
+    expect(data.max_dex_bonus).to.equal(0);
+    expect(data.penalty).to.equal(0);
+    expect(data.spell_failure).to.equal(0);
+  });
 });

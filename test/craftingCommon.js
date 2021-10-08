@@ -89,7 +89,8 @@ describe('craftingCommon', function() {
 
       await ganache.increaseTime(24*60*60 + 1);
       attempt++;
-    } while(bal < 1 && attempt < 100);
+      if (attempt > 100) expect.fail("Too many craft attempts");
+    } while(bal < 1);
 
     expect(await crafting.balanceOf(user.address)).to.equal(1);
   });
@@ -110,7 +111,8 @@ describe('craftingCommon', function() {
 
       await ganache.increaseTime(24*60*60 + 1);
       attempt++;
-    } while(bal < 1 && attempt < 100);
+      if (attempt > 100) expect.fail("Too many craft attempts");
+    } while(bal < 1);
 
     await crafting.connect(user).transferFrom(user.address, receiver.address, 0);
     expect(await crafting.ownerOf(0)).to.equal(receiver.address);

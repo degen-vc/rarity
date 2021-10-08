@@ -183,7 +183,7 @@ interface IERC721Enumerable is IERC721 {
 }
 
 library rl {
-    struct _service_data {
+    struct _summoner_service_data {
         uint goldBalance;
         uint xp;
         string class;
@@ -198,6 +198,26 @@ library rl {
         uint32 _int; 
         uint32 _wis; 
         uint32 _cha;
+    }
+
+    struct _item_service_data {
+        string base_type;
+        uint item_type;
+        uint weight;
+        uint gold_cost;
+        string name;
+        string description;
+        string proficiency; 
+        string encumbrance; 
+        string damage_type; 
+        uint damage;
+        uint critical;
+        int critical_modifier;
+        uint range_increment; 
+        uint armor_bonus;
+        uint max_dex_bonus;
+        int penalty;
+        uint spell_failure;
     }
 
     struct _base {
@@ -335,12 +355,63 @@ interface rarity_mat1 is rarity_fungible, adventurable {
 }
 
 interface rarity_item1 is IERC721Enumerable {
-    function items(uint) external view returns (uint8, uint8, uint32, uint);
+    function items(uint) external view returns (uint8, uint8, uint32, uint, address);
+    function get_type(uint) external pure returns (string memory);
 }
 
 interface rarity_names is IERC721Enumerable {
     function summoner_to_name_id(uint _summoner) external view returns (uint id);
 }
+
+
+interface codex_items_goods {
+    function item_by_id(uint _id) external pure returns(
+        uint id,
+        uint cost,
+        uint weight,
+        string memory name,
+        string memory description
+    );
+}
+
+interface codex_items_armor {
+    function get_proficiency_by_id(uint _id) external pure returns (string memory description);
+    function item_by_id(uint _id) external pure returns(
+        uint id,
+        uint cost,
+        uint proficiency,
+        uint weight,
+        uint armor_bonus,
+        uint max_dex_bonus,
+        int penalty,
+        uint spell_failure,
+        string memory name,
+        string memory description
+    );
+}
+
+interface codex_items_weapons {
+    struct weapon {
+        uint id;
+        uint cost;
+        uint proficiency;
+        uint encumbrance;
+        uint damage_type;
+        uint weight;
+        uint damage;
+        uint critical;
+        int critical_modifier;
+        uint range_increment;
+        string name;
+        string description;
+    }
+
+    function get_proficiency_by_id(uint _id) external pure returns (string memory description);
+    function get_encumbrance_by_id(uint _id) external pure returns (string memory description);
+    function get_damage_type_by_id(uint _id) external pure returns (string memory description);
+    function item_by_id(uint _id) external pure returns(weapon memory _weapon);
+}
+
 
 contract rarity_library {
     using Strings for uint;
@@ -352,6 +423,9 @@ contract rarity_library {
     rarity_mat1 immutable _mat1;
     rarity_item1 immutable _items1;
     rarity_names immutable _names;
+    codex_items_goods immutable _goods;
+    codex_items_armor immutable _armor;
+    codex_items_weapons immutable _weapons;
 
     constructor(
         rarity_manifested _rarity_manifested,
@@ -360,7 +434,10 @@ contract rarity_library {
         rarity_gold _rarity_gold,
         rarity_mat1 _rarity_mat1,
         rarity_item1 _rarity_item1,
-        rarity_names _rarity_names
+        rarity_names _rarity_names,
+        codex_items_goods _codex_items_goods,
+        codex_items_armor _codex_items_armor, 
+        codex_items_weapons _codex_items_weapons
         ) {
         _rm = _rarity_manifested;
         _attr = _rarity_attributes;
@@ -369,6 +446,9 @@ contract rarity_library {
         _mat1 = _rarity_mat1;
         _items1 = _rarity_item1;
         _names = _rarity_names;
+        _goods = _codex_items_goods;
+        _armor = _codex_items_armor;
+        _weapons = _codex_items_weapons;
     }
 
     function base(uint _s) public view returns (rl._base memory c) {
@@ -495,18 +575,18 @@ contract rarity_library {
         uint _total_items = _items1.balanceOf(_owner);
         items = new rl._item1[](_total_items);
         for (uint i = 0; i < _total_items; i++) {
-            (uint8 _base_type, uint8 _item_type, uint32 _crafted, uint _crafter) = _items1.items(_items1.tokenOfOwnerByIndex(_owner, i));
+            (uint8 _base_type, uint8 _item_type, uint32 _crafted, uint _crafter, ) = _items1.items(_items1.tokenOfOwnerByIndex(_owner, i));
             items[i] = rl._item1(_base_type, _item_type, _crafted, _crafter);
         }
     }
 
-    function baseInfo(uint _s) public view returns(uint _xp, string memory _class, uint _level) {
+    function summonerBaseInfo(uint _s) public view returns(uint _xp, string memory _class, uint _level) {
         uint class;
        (_xp,, class, _level) = _rm.summoner(_s);
        _class = _rm.classes(class);
     }
 
-    function isTransferred(uint _s) public view returns(bool _transferred) {
+    function summonerIsTransferred(uint _s) public view returns(bool _transferred) {
         address _minter = _rm.minters(_s);
         address _owner = _rm.ownerOf(_s);
         return _owner != _minter;
@@ -522,15 +602,51 @@ contract rarity_library {
         _class_skills = _skills.class_skills(_class);
     }
 
-    function serviceData(uint _s) public view returns (rl._service_data memory data) {
+    function summonerServiceData(uint _s) public view returns (rl._summoner_service_data memory data) {
         data.goldBalance = _gold.balanceOf(_s);
         
-        (data.xp, data.class, data.level) = baseInfo(_s);
-        data.transferred = isTransferred(_s);
+        (data.xp, data.class, data.level) = summonerBaseInfo(_s);
+        data.transferred = summonerIsTransferred(_s);
         data.hasName = hasName(_s);
         (data.current_skills, data.class_skills) =  currentAndClassSkills(_s);
 
         (data._str, data._dex, data._con, data._int, data._wis, data._cha) = _attr.ability_scores(_s);
+    }
+
+    function itemIsTransferred(uint _i) public view returns(bool _transferred) {
+        (,,,,address _minter) = _items1.items(_i);
+        address _owner = _items1.ownerOf(_i);
+        return _owner != _minter;
+    }
+
+    function itemServiceData(uint _i) public view returns (rl._item_service_data memory data) {
+        uint8 _base_type;
+        (_base_type, data.item_type,,, ) = _items1.items(_i);
+        data.base_type = _items1.get_type(_base_type);
+
+        if (_base_type == 1) {
+            (, data.gold_cost, data.weight, data.name, data.description) = _goods.item_by_id(data.item_type);
+        } else if (_base_type == 2) {
+            uint _proficiency;
+            
+            (, data.gold_cost, _proficiency, data.weight, data.armor_bonus, data.max_dex_bonus,,,,) = _armor.item_by_id(data.item_type);
+            (,,,,,, data.penalty, data.spell_failure, data.name, data.description) = _armor.item_by_id(data.item_type);
+
+            data.proficiency = _armor.get_proficiency_by_id(_proficiency);
+        } else if (_base_type == 3) {
+            codex_items_weapons.weapon memory _weapon = _weapons.item_by_id(data.item_type);
+            data.gold_cost = _weapon.cost;
+            data.proficiency = _weapons.get_proficiency_by_id(_weapon.proficiency);
+            data.encumbrance = _weapons.get_encumbrance_by_id(_weapon.encumbrance);
+            data.damage_type = _weapons.get_damage_type_by_id(_weapon.damage_type);
+            data.weight = _weapon.weight;
+            data.damage = _weapon.damage;
+            data.critical = _weapon.critical; 
+            data.critical_modifier = _weapon.critical_modifier;
+            data.range_increment = _weapon.range_increment;
+            data.name = _weapon.name;
+            data.description = _weapon.description;
+        } 
     }
 }
 
