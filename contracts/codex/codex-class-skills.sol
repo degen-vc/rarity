@@ -18,9 +18,13 @@ contract codex {
     string constant public index = "Class Skills";
     string constant public class = "Any";
 
-    codex_skills constant _codex_skills = codex_skills(0x67ae39a2Ee91D7258a86CD901B17527e19E493B3);
+    codex_skills immutable _codex_skills;
 
-    function class_skills_by_name(uint _class) public pure returns (string[] memory) {
+    constructor(codex_skills _codex) {
+        _codex_skills = _codex;
+    }
+
+    function class_skills_by_name(uint _class) public view returns (string[] memory) {
         bool[36] memory _skills = class_skills(_class);
         uint x = 0;
         for (uint i = 0; i < 36; i++) {
