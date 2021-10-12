@@ -17,12 +17,15 @@ interface scarcity_gold_interface {
 /// @author swit.eth / https://twitter.com/nomorebear
 contract wrapped_scarcity_gold is ERC20('Wrapped Scarcity Gold', 'WSGOLD') {
     uint public immutable SUMMMONER_ID;
-    scarcity_interface public constant scarcity = scarcity_interface(0x4fb729BDb96d735692DCACD9640cF7e3aA859B25);
-    scarcity_gold_interface public constant gold = scarcity_gold_interface(0x7303E7a860DAFfE4d0b33615479648cb3496903b);
+    scarcity_interface public immutable scarcity;
+    scarcity_gold_interface public immutable gold;
 
-    constructor() {
-        SUMMMONER_ID = scarcity.next_summoner();
-        scarcity.summon(11);
+    constructor(scarcity_interface _scarcity, scarcity_gold_interface _gold) {
+        SUMMMONER_ID = _scarcity.next_summoner();
+        _scarcity.summon(11);
+
+        scarcity = _scarcity;
+        gold = _gold;
     }
 
     function deposit(uint from, uint amount) external {
