@@ -13,12 +13,12 @@ const {PRIVATE_KEY, POLYGONSCAN_API_KEY} = process.env;
  */
 module.exports = {
   networks: {
-    bscTestnet: {
-      url: `https://data-seed-prebsc-1-s1.binance.org:8545`,
+    matic: {
+      url: `https://rpc-mainnet.maticvigil.com/`,
       accounts: [PRIVATE_KEY]
     },
-    bscMainnet: {
-      url: `https://bsc-dataseed1.ninicoin.io`,
+    mumbai: {
+      url: `https://rpc-mumbai.maticvigil.com/`,
       accounts: [PRIVATE_KEY]
     },
   },
