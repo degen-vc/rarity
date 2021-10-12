@@ -16,7 +16,10 @@ contract rarity_gold is Ownable {
 
     uint public totalSupply = 0;
 
-    uint8 public formulaModifier;
+    int public paramA = 500e18;
+    int public paramB = 500e18;
+    int public paramC = 0;
+    int public paramD = 0;
     
     rarity immutable rm;
 
@@ -33,12 +36,11 @@ contract rarity_gold is Ownable {
     }
 
     function wealth_by_level(uint level) public view returns (uint wealth) {
-        if (formulaModifier > 1 && level > 1) return 1000e18;
-        if (level > 22 && formulaModifier == 1) return 0;
-        for (uint i = 1; i < level; i++) {
-            wealth += (i * 1000e18) - (formulaModifier * (level - 2) * 50e18);
-            if (formulaModifier > 0) return wealth;
-        }
+        if (level < 2) return 0;
+        int intLevel = int(level);
+        int intWealth = paramA*((intLevel-1)**2)+paramB*(intLevel-1)+paramC+paramD/(intLevel-1);
+        if (intWealth < 0) return 0;
+        return uint(intWealth);
     }
 
     function _isApprovedOrOwner(uint _summoner) internal view returns (bool) {
@@ -107,10 +109,12 @@ contract rarity_gold is Ownable {
 
         emit Transfer(from, to, amount);
     }
-        
-    // @dev Change formula modifier to variate gold emission. 0 for standard formula, 1 for decreasing and >1 for static emission
-    function updateFormulaModifier(uint8 _formulaModifier) external onlyOwner {
-        formulaModifier = _formulaModifier;
+
+    function updateFormulaParams(int _a, int _b, int _c, int _d) external onlyOwner {
+        paramA = _a;
+        paramB = _b;
+        paramC = _c;
+        paramD = _d;
     }
 
 }
