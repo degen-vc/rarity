@@ -6,8 +6,7 @@ interface IAdventureTime {
 }
 
 contract DaycareManager {
-    IAdventureTime adventureTime =
-        IAdventureTime(0xeAAe5c3C28A468E3dB4B044B2Bc2Dc1403638163);
+    IAdventureTime immutable adventureTime;
     uint256 public constant DAILY_FEE = 0.01 * 1e18;
 
     mapping(uint256 => uint256) public daysPaid;
@@ -18,6 +17,10 @@ contract DaycareManager {
         uint256 _days
     );
     event executedDaycare(address _executor, uint256 _summonerId);
+
+    constructor(address _adventureTime) {
+        adventureTime = IAdventureTime(_adventureTime);
+    }
 
     function registerDaycare(
         uint256[] calldata _summonerIds,
