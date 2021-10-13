@@ -123,4 +123,29 @@ describe('Gold', function() {
     expect(await gold.wealth_by_level(33)).to.equal(utils.parseEther('0'));
   });
 
+  it('should return 19000 wealth on 20 level and params (0, 1000, 0, 0)', async ()=>{
+    await gold.connect(owner).updateFormulaParams(utils.parseEther('0'), utils.parseEther('1000'), utils.parseEther('0'), utils.parseEther('0'));
+    expect(await gold.wealth_by_level(20)).to.equal(utils.parseEther('19000'));
+  });
+
+  it('should return 0 wealth on 2 level and params (-1, -1, -1, -1)', async ()=>{
+    await gold.connect(owner).updateFormulaParams(utils.parseEther('-1'), utils.parseEther('-1'), utils.parseEther('-1'), utils.parseEther('-1'));
+    expect(await gold.wealth_by_level(20)).to.equal(utils.parseEther('0'));
+  });
+
+  it('should return 100 wealth on 20 level and params (0, -50, 1050, 0)', async ()=>{
+    await gold.connect(owner).updateFormulaParams(utils.parseEther('0'), utils.parseEther('-50'), utils.parseEther('1050'), utils.parseEther('0'));
+    expect(await gold.wealth_by_level(20)).to.equal(utils.parseEther('100'));
+  });
+
+  it('should return 0 wealth on 1000000 level and params (-1000000, 1000000, 1000000, 1000000)', async ()=>{
+    await gold.connect(owner).updateFormulaParams(utils.parseEther('-1000000'), utils.parseEther('1000000'), utils.parseEther('1000000'), utils.parseEther('1000000'));
+    expect(await gold.wealth_by_level(1000000)).to.equal(utils.parseEther('0'));
+  });
+
+  it('should return >0 wealth on 1000000 level and params (0, 0, 0, 1)', async ()=>{
+    await gold.connect(owner).updateFormulaParams(utils.parseEther('0'), utils.parseEther('0'), utils.parseEther('0'), utils.parseEther('1'));
+    expect(await gold.wealth_by_level(1000000)).to.above(utils.parseEther('0'));
+  });
+
 });
