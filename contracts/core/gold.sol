@@ -38,7 +38,7 @@ contract rarity_gold is Ownable {
     function wealth_by_level(uint level) public view returns (uint wealth) {
         if (level < 2) return 0;
         int intLevel = int(level);
-        int intWealth = paramA*((intLevel-1)**2)+paramB*(intLevel-1)+paramC+paramD/(intLevel-1);
+        int intWealth = paramA * ((intLevel - 1) ** 2) + paramB * (intLevel - 1) + paramC + paramD / (intLevel - 1);
         if (intWealth < 0) return 0;
         return uint(intWealth);
     }
