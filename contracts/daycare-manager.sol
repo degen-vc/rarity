@@ -18,8 +18,8 @@ contract DaycareManager {
     );
     event executedDaycare(address _executor, uint256 _summonerId);
 
-    constructor(address _adventureTime) {
-        adventureTime = IAdventureTime(_adventureTime);
+    constructor(IAdventureTime _adventureTime) {
+        adventureTime = _adventureTime;
     }
 
     function registerDaycare(

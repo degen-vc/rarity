@@ -12,8 +12,8 @@ interface IRarity {
 contract AdventureTime {
     IRarity immutable rarity;
 
-    constructor(address _rarity) {
-        rarity = IRarity(_rarity);
+    constructor(IRarity _rarity) {
+        rarity = _rarity;
     }
 
     // you'll be able to send summoners that you (the caller) don't own on an
