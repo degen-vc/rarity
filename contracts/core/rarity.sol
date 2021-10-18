@@ -974,10 +974,7 @@ contract rarity  is Ownable, ERC721Enumerable {
     }
 
     function xp_required(uint curent_level) public pure returns (uint xp_to_next_level) {
-        xp_to_next_level = curent_level * 1000e18;
-        for (uint i = 1; i < curent_level; i++) {
-            xp_to_next_level += curent_level * 1000e18;
-        }
+        return curent_level ** 2 * 1000e18;
     }
 
     function classes(uint id) public pure returns (string memory description) {
