@@ -1,6 +1,8 @@
 const hardhat = require('hardhat');
 require('dotenv').config();
 
+const { PAYMENT_TOKEN, NAME_BUY_PRICE_WEI } = process.env;
+
 async function main() {
 
   accounts = await hardhat.ethers.getSigners();
@@ -12,8 +14,14 @@ async function main() {
 
   console.log("Scarcity deployed to: ", scarcity.address);
 
-  const Gold = await hardhat.ethers.getContractFactory('contracts/core/gold.sol:rarity_gold');
-  const gold = await Gold.deploy(scarcity.address);
+  const NamesV3 = await hardhat.ethers.getContractFactory('contracts/core/NamesV3.sol:NamesV3');
+  const namesV3 = await NamesV3.deploy(scarcity.address, PAYMENT_TOKEN, NAME_BUY_PRICE_WEI);
+  await namesV3.deployed();
+
+  console.log("NamesV3 deployed to: ", namesV3.address);
+
+  const Gold = await hardhat.ethers.getContractFactory('contracts/core/GoldV2.sol:GoldV2');
+  const gold = await Gold.deploy(scarcity.address, namesV3.address);
   await gold.deployed();
 
   console.log("Gold deployed to: ", gold.address);
@@ -84,15 +92,6 @@ async function main() {
 
   console.log("Crafting deployed to: ", crafting.address);
 
-  await scarcity.connect(owner).summon(11);
-  const names_keeper_id = (await scarcity.next_summoner()) - 1;
-
-  const NamesV2 = await hardhat.ethers.getContractFactory('contracts/core/namesv2.sol:rarity_names');
-  const namesV2 = await NamesV2.deploy(scarcity.address, gold.address, names_keeper_id);
-  await namesV2.deployed();
-
-  console.log("NamesV2 deployed to: ", namesV2.address);
-
   const Wrapped_gold = await hardhat.ethers.getContractFactory('contracts/wgold.sol:wrapped_scarcity_gold');
   const wrapped_gold = await Wrapped_gold.deploy(scarcity.address, gold.address);
   await wrapped_gold.deployed();
@@ -112,7 +111,7 @@ async function main() {
   console.log("Daycare manager deployed to: ", daycare_manager.address);
 
   const Library = await hardhat.ethers.getContractFactory('contracts/scarcity-library.sol:rarity_library');
-  const library = await Library.deploy(scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, namesV2.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address);
+  const library = await Library.deploy(scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, namesV3.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address);
   await library.deployed();
 
   console.log("Library deployed to: ", library.address);
