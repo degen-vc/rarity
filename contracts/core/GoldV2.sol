@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
-import { NamesV3 } from "./NamesV3.sol";
 
 interface rarity {
     function level(uint) external view returns (uint);
     function getApproved(uint) external view returns (address);
     function ownerOf(uint) external view returns (address);
+}
+
+interface names_v3 {
+    function summoner_to_name_id(uint) external view returns (uint);
 }
 
 contract GoldV2 {
@@ -16,9 +19,9 @@ contract GoldV2 {
     uint256 public totalSupply;
 
     rarity immutable rm;
-    NamesV3 immutable names;
+    names_v3 immutable names;
 
-    constructor(rarity _rarity_manifested, NamesV3 _names) {
+    constructor(rarity _rarity_manifested, names_v3 _names) {
         rm = _rarity_manifested;
         names = _names;
     }
