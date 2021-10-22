@@ -2,6 +2,8 @@
 
 pragma solidity ^0.8.3;
 
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
 // Part: ICrafting
 
 interface ICrafting {
@@ -627,12 +629,15 @@ interface IERC721 is IERC165 {
     ) external;
 }
 
+
+
 // File: RarityCraftingIMarket.sol
 
 /// @dev Rarity Crafting (I) market to allow trading of crafted items.
 /// @author swit.eth (@nomorebear) + nipun (@nipun_pit) + jade (@jade_arin)
 contract RarityCraftingIMarket is Initializable, ERC721Holder {
   using EnumerableSet for EnumerableSet.UintSet;
+  using SafeERC20 for IERC20;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
   event List(uint indexed id, address indexed lister, uint price);
@@ -648,6 +653,7 @@ contract RarityCraftingIMarket is Initializable, ERC721Holder {
   event SetFeeBps(uint feeBps);
 
   IERC721 public nft;
+  IERC20 public gold;
   uint public feeBps;
   address public owner;
   uint private lock;
@@ -669,10 +675,11 @@ contract RarityCraftingIMarket is Initializable, ERC721Holder {
   }
 
   /// @dev Initializes the contract. Can only be called once.
-  function initialize(IERC721 _nft, uint _feeBps) external initializer {
+  function initialize(IERC721 _nft, IERC20 _gold, uint _feeBps) external initializer {
     lock = 1;
     owner = msg.sender;
     nft = _nft;
+    gold = _gold;
     feeBps = _feeBps;
     emit OwnershipTransferred(address(0), msg.sender);
     emit SetFeeBps(_feeBps);
@@ -723,17 +730,17 @@ contract RarityCraftingIMarket is Initializable, ERC721Holder {
   }
 
   /// @dev Buys the given crafting. Must pay the exact correct prirce.
-  function buy(uint _id) external payable nonReentrant {
+  function buy(uint _id) external nonReentrant {
     uint price = prices[_id];
     require(price > 0, 'not listed');
-    require(msg.value == price, 'bad msg.value');
+    gold.safeTransferFrom(msg.sender, address(this), price);
     uint fee = (price * feeBps) / 10000;
     uint get = price - fee;
     address lister = listers[_id];
     prices[_id] = 0;
     listers[_id] = address(0);
     nft.safeTransferFrom(address(this), msg.sender, _id);
-    payable(lister).transfer(get);
+    gold.safeTransfer(lister, get);
     set.remove(_id);
     mySet[lister].remove(_id);
     emit Buy(_id, lister, msg.sender, price, fee);
@@ -741,7 +748,7 @@ contract RarityCraftingIMarket is Initializable, ERC721Holder {
 
   /// @dev Withdraw trading fees. Only called by owner.
   function withdraw(uint _amount) external onlyOwner {
-    payable(msg.sender).transfer(_amount == 0 ? address(this).balance : _amount);
+    gold.safeTransfer(msg.sender, _amount);
   }
 
   /// @dev Returns list the total number of listed craftings.
