@@ -91,8 +91,8 @@ async function main() {
   marketLogic.connect(owner).initialize(constants.AddressZero, constants.AddressZero, utils.parseEther('0'));
 
   const ProxyMarket = await hardhat.ethers.getContractFactory('contracts/market/ScarcityCraftingIMarketProxy.sol:RarityCraftingIMarketProxy');
-  let fee = 0;
-  let data = marketLogic.interface.encodeFunctionData("initialize", [crafting.address, wrapped_gold.address, fee]);
+  const fee = 0;
+  const data = marketLogic.interface.encodeFunctionData("initialize", [crafting.address, wrapped_gold.address, fee]);
   const proxyMarket = await ProxyMarket.deploy(marketLogic.address, proxyAdmin.address, data);   
   await proxyMarket.deployed();
 
