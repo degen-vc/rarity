@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
-import { NamesV3 } from "./NamesV3.sol";
+
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 interface rarity {
     function level(uint) external view returns (uint);
@@ -8,17 +9,26 @@ interface rarity {
     function ownerOf(uint) external view returns (address);
 }
 
-contract GoldV2 {
+interface names_v3 {
+    function summoner_to_name_id(uint) external view returns (uint);
+}
+
+contract GoldV2 is Ownable {
     string public constant name = "Scarcity Gold";
     string public constant symbol = "SGOLD";
     uint256 public constant decimals = 18;
 
     uint256 public totalSupply;
 
-    rarity immutable rm;
-    NamesV3 immutable names;
+    int public paramA = 500e18;
+    int public paramB = 500e18;
+    int public paramC = 0;
+    int public paramD = 0;
 
-    constructor(rarity _rarity_manifested, NamesV3 _names) {
+    rarity immutable rm;
+    names_v3 immutable names;
+
+    constructor(rarity _rarity_manifested, names_v3 _names) {
         rm = _rarity_manifested;
         names = _names;
     }
@@ -81,10 +91,12 @@ contract GoldV2 {
 
     // --- External View Functions ---
 
-    function wealth_by_level(uint level) public pure returns (uint wealth) {
-        for (uint i = 1; i < level; i++) {
-            wealth += i * 1000e18;
-        }
+    function wealth_by_level(uint level) public view returns (uint wealth) {
+        if (level < 2) return 0;
+        int intLevel = int(level);
+        int intWealth = paramA * ((intLevel - 1) ** 2) + paramB * (intLevel - 1) + paramC + paramD / (intLevel - 1);
+        if (intWealth < 0) return 0;
+        return uint(intWealth);
     }
 
     function claimable(uint summoner) external view returns (uint amount) {
@@ -115,5 +127,12 @@ contract GoldV2 {
 
     function _isApprovedOrOwner(uint _summoner) internal view returns (bool) {
         return rm.getApproved(_summoner) == msg.sender || rm.ownerOf(_summoner) == msg.sender;
+    }
+
+    function updateFormulaParams(int _a, int _b, int _c, int _d) external onlyOwner {
+        paramA = _a;
+        paramB = _b;
+        paramC = _c;
+        paramD = _d;
     }
 }
