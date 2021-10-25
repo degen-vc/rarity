@@ -1,4 +1,5 @@
 const hardhat = require('hardhat');
+const { constants } = require('ethers');
 require('dotenv').config();
 
 const { PAYMENT_TOKEN, NAME_BUY_PRICE_WEI } = process.env;
@@ -80,6 +81,21 @@ async function main() {
   const library = await Library.deploy(scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, namesV3.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address);
   await library.deployed();
 
+  const ProxyAdmin = await hardhat.ethers.getContractFactory('contracts/market/ProxyAdmin.sol:ProxyAdminImpl');
+  const proxyAdmin = await ProxyAdmin.deploy();
+  await proxyAdmin.deployed();
+
+  const Market = await hardhat.ethers.getContractFactory('contracts/market/ScarcityCraftingIMarket.sol:RarityCraftingIMarket');
+  const marketLogic = await Market.deploy();
+  await marketLogic.deployed();
+  marketLogic.connect(owner).initialize(constants.AddressZero, constants.AddressZero, utils.parseEther('0'));
+
+  const ProxyMarket = await hardhat.ethers.getContractFactory('contracts/market/ScarcityCraftingIMarketProxy.sol:RarityCraftingIMarketProxy');
+  let fee = 0;
+  let data = marketLogic.interface.encodeFunctionData("initialize", [crafting.address, wrapped_gold.address, fee]);
+  const proxyMarket = await ProxyMarket.deploy(marketLogic.address, proxyAdmin.address, data);   
+  await proxyMarket.deployed();
+
   await new Promise(resolve => setTimeout(resolve, 60000));
 
   await hardhat.run("verify:verify", {address: scarcity.address});
@@ -100,6 +116,9 @@ async function main() {
   await hardhat.run("verify:verify", {address: adventure_time.address, constructorArguments: [scarcity.address]});
   await hardhat.run("verify:verify", {address: daycare_manager.address, constructorArguments: [adventure_time.address]});
   await hardhat.run("verify:verify", {address: library.address, constructorArguments: [scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, namesV3.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address]});
+  await hardhat.run("verify:verify", {address: proxyAdmin.address});
+  await hardhat.run("verify:verify", {address: marketLogic.address});
+  await hardhat.run("verify:verify", {address: proxyMarket.address, constructorArguments: [marketLogic.address, proxyAdmin.address, data]});
 
   console.log("Scarcity deployed and verified to: ", scarcity.address);
   console.log("NamesV3 deployed and verified to: ", namesV3.address);
@@ -119,7 +138,9 @@ async function main() {
   console.log("Adventure time deployed and verified to: ", adventure_time.address);
   console.log("Daycare manager deployed and verified to: ", daycare_manager.address);
   console.log("Library deployed and verified to: ", library.address);
-
+  console.log("ProxyAdmin deployed and verified to: ", proxyAdmin.address);
+  console.log("MarketLogic deployed and verified to: ", marketLogic.address);
+  console.log("ProxyMarket deployed and verified to: ", proxyMarket.address);
 }
 
 main()
