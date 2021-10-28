@@ -1,5 +1,5 @@
 const hardhat = require('hardhat');
-const { constants } = require('ethers');
+const { constants, utils } = require('ethers');
 require('dotenv').config();
 
 const { PAYMENT_TOKEN, NAME_BUY_PRICE_WEI } = process.env;
@@ -88,7 +88,7 @@ async function main() {
   const Market = await hardhat.ethers.getContractFactory('contracts/market/ScarcityCraftingIMarket.sol:RarityCraftingIMarket');
   const marketLogic = await Market.deploy();
   await marketLogic.deployed();
-  marketLogic.connect(owner).initialize(constants.AddressZero, constants.AddressZero, utils.parseEther('0'));
+  await marketLogic.connect(owner).initialize(constants.AddressZero, constants.AddressZero, utils.parseEther('0'));
 
   const ProxyMarket = await hardhat.ethers.getContractFactory('contracts/market/ScarcityCraftingIMarketProxy.sol:RarityCraftingIMarketProxy');
   const fee = 0;
