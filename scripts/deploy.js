@@ -116,9 +116,9 @@ async function main() {
   await hardhat.run("verify:verify", {address: adventure_time.address, constructorArguments: [scarcity.address]});
   await hardhat.run("verify:verify", {address: daycare_manager.address, constructorArguments: [adventure_time.address]});
   await hardhat.run("verify:verify", {address: library.address, constructorArguments: [scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, namesV3.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address]});
-  await hardhat.run("verify:verify", {address: proxyAdmin.address});
-  await hardhat.run("verify:verify", {address: marketLogic.address});
-  await hardhat.run("verify:verify", {address: proxyMarket.address, constructorArguments: [marketLogic.address, proxyAdmin.address, data]});
+  await hardhat.run("verify:verify", {address: proxyAdmin.address, contract: 'contracts/market/ProxyAdmin.sol:ProxyAdminImpl'});
+  await hardhat.run("verify:verify", {address: marketLogic.address, contract: 'contracts/market/ScarcityCraftingIMarket.sol:RarityCraftingIMarket'});
+  await hardhat.run("verify:verify", {address: proxyMarket.address, constructorArguments: [marketLogic.address, proxyAdmin.address, data], contract: 'contracts/market/ScarcityCraftingIMarketProxy.sol:RarityCraftingIMarketProxy'});
 
   console.log("Scarcity deployed and verified to: ", scarcity.address);
   console.log("NamesV3 deployed and verified to: ", namesV3.address);
