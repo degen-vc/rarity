@@ -20,8 +20,8 @@ contract GoldV2 is Ownable {
 
     uint256 public totalSupply;
 
-    int public paramA = 500e18;
-    int public paramB = 500e18;
+    int public paramA = 500e18 * 1e18;
+    int public paramB = 500e18 * 1e18;
     int public paramC = 0;
     int public paramD = 0;
 
@@ -93,8 +93,8 @@ contract GoldV2 is Ownable {
 
     function wealth_by_level(uint level) public view returns (uint wealth) {
         if (level < 2) return 0;
-        int intLevel = int(level);
-        int intWealth = paramA * ((intLevel - 1) ** 2) + paramB * (intLevel - 1) + paramC + paramD / (intLevel - 1);
+        int intLevel = int(level - 1);
+        int intWealth = (paramA * ((intLevel) ** 2) + paramB * (intLevel) + paramC + paramD / (intLevel)) / 1e18;
         if (intWealth < 0) return 0;
         return uint(intWealth);
     }
