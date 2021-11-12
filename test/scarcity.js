@@ -64,25 +64,4 @@ describe('Scarcity', function() {
     expect(await scarcity.ownerOf(0)).to.equal(receiver.address);
     expect(await scarcity.minters(0)).to.equal(user.address);
   });
-
-  it('should return 0 `xp to next level`  on level 0', async ()=> {
-    expect(await scarcity.xp_required(0)).to.equal(utils.parseEther('0'));
-  });
-
-  it('should return 1000 `xp to next level` on level 1', async ()=> {
-    expect(await scarcity.xp_required(1)).to.equal(utils.parseEther('1000'));
-  });
-
-  it('should return 100000 `xp to next level` on level 10', async ()=> {
-    expect(await scarcity.xp_required(10)).to.equal(utils.parseEther('100000'));
-  });
-
-  it('should return 998001000 `xp to next level` on level 999', async ()=> {
-    expect(await scarcity.xp_required(999)).to.equal(utils.parseEther('998001000'));
-  });
-
-  it('should return 9999800001000 `xp to next level` on level 99999', async ()=> {
-    expect(await scarcity.xp_required(99999)).to.equal(utils.parseEther('9999800001000'));
-  });
-
 });
