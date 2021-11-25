@@ -237,7 +237,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "A mace is made of metal, even the haft, making it quite heavy and very hard to break.";
     }
 
     function sickle() public pure returns (weapon memory _weapon) {
@@ -267,7 +267,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "A wooden club is so easy to find and fashion that it has no cost.";
     }
 
     function mace_heavy() public pure returns (weapon memory _weapon) {
@@ -282,7 +282,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "A mace is made of metal, even the haft, making it quite heavy and very hard to break.";
     }
 
     function morningstar() public pure returns (weapon memory _weapon) {
@@ -297,7 +297,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "This simple weapon combines the impact of a club with the piercing force of spikes.";
     }
 
     function shortspear() public pure returns (weapon memory _weapon) {
@@ -357,7 +357,7 @@ contract codex {
         _weapon.critical = 3;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "Shorter than a longspear, the spear's design is essentially the same. A spear can be thrown. If you use a ready action to set a spear against a charge, you deal double damage on a successful hit against a charging character.";
     }
 
     function crossbow_heavy() public pure returns (weapon memory _weapon) {
@@ -402,7 +402,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 20;
-        _weapon.description = "";
+        _weapon.description = "A dart is the size of a large arrow and has a weighted head. Essentially, it is a small javelin.";
     }
 
     function javelin() public pure returns (weapon memory _weapon) {
@@ -447,7 +447,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "This one-handed axe is short and designed for use with one hand. Unlike throwing axes, it is not well balanced for a graceful tumbling motion, and is instead heavier at its head.";
     }
 
     function hammer_light() public pure returns (weapon memory _weapon) {
@@ -462,7 +462,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "This is a small sledge light enough to throw. It is favored by dwarves.";
     }
 
     function handaxe() public pure returns (weapon memory _weapon) {
@@ -477,7 +477,7 @@ contract codex {
         _weapon.critical = 3;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "Dwarves favor these axes as off-hand weapons.";
     }
 
     function kukri() public pure returns (weapon memory _weapon) {
@@ -492,7 +492,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = -2;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "This heavy, curved dagger has its sharp edge on the inside of the curve.";
     }
 
     function pick_light() public pure returns (weapon memory _weapon) {
@@ -507,7 +507,7 @@ contract codex {
         _weapon.critical = 4;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "A pick is designed to concentrate its force on a small, penetrating point. A light or heavy pick resembles a miner's pick but is specifically designed for war.";
     }
 
     function sap() public pure returns (weapon memory _weapon) {
@@ -522,7 +522,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "A sap comes in handy when you want to knock an opponent our instead of killing him.";
     }
 
     function sword_short() public pure returns (weapon memory _weapon) {
@@ -537,7 +537,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = -1;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "This sword is popular as an off-hand weapon or as a primary weapon for Small characters.";
     }
 
     function battleaxe() public pure returns (weapon memory _weapon) {
@@ -552,7 +552,7 @@ contract codex {
         _weapon.critical = 3;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "The battleaxe is the most common melee weapon among dwarves.";
     }
 
     function flail() public pure returns (weapon memory _weapon) {
@@ -582,7 +582,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = -1;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "This classic, straight blade is the weapon of knighthood and valor. It is the favored weapon of paladins.";
     }
 
     function pick_heavy() public pure returns (weapon memory _weapon) {
@@ -597,7 +597,7 @@ contract codex {
         _weapon.critical = 4;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "A pick is designed to concentrate its force on a small, penetrating point. A light or heavy pick resembles a miner's pick but is specifically designed for war.";
     }
 
     function rapier() public pure returns (weapon memory _weapon) {
@@ -627,7 +627,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = -2;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "The curve on this blade makes the weapon's edge effectively sharper.";
     }
 
     function trident() public pure returns (weapon memory _weapon) {
@@ -657,7 +657,7 @@ contract codex {
         _weapon.critical = 3;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "This weapon, favored by dwarves, is a one-handed sledge or maul with a large, heavy head.";
     }
 
     function falchion() public pure returns (weapon memory _weapon) {
@@ -672,7 +672,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = -2;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "This sword, which is essentially a two-handed scimitar, has a curve that gives it an effectively keener edge.";
     }
 
     function glaive() public pure returns (weapon memory _weapon) {
@@ -702,7 +702,7 @@ contract codex {
         _weapon.critical = 3;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "This big, heavy axe is a favorite of barbarians or anybody else who wants the capability to deal out incredible damage.";
     }
 
     function greatclub() public pure returns (weapon memory _weapon) {
@@ -717,7 +717,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = 0;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "A greatclub is a two-handed version of a regular club. It is often studded with nails or spikes or ringed by bands of iron.";
     }
 
     function flail_heavy() public pure returns (weapon memory _weapon) {
@@ -747,7 +747,7 @@ contract codex {
         _weapon.critical = 2;
         _weapon.critical_modifier = -1;
         _weapon.range_increment = 0;
-        _weapon.description = "";
+        _weapon.description = "Adventurers recognize the greatsword as one of the best melee weapons available. It's reliable and powerful.";
     }
 
     function guisarme() public pure returns (weapon memory _weapon) {

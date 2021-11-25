@@ -89,7 +89,7 @@ contract codex {
         max_dex_bonus = 8;
         penalty = 0;
         spell_failure = 5;
-        description = "";
+        description = "Padded armor features quilted layers of cloth and barring. It gets hot quickly and can become foul with sweat, grime, lice, and fleas.";
     }
 
     function leather() public pure returns (
@@ -113,7 +113,7 @@ contract codex {
         max_dex_bonus = 6;
         penalty = 0;
         spell_failure = 10;
-        description = "";
+        description = "The breastplate and shoulder protectors of this armor are made of leather that has been stiffened by boiling in oil. The rest of the armor is softer and more flexible leather.";
     }
 
     function studded_leather() public pure returns (
@@ -137,7 +137,7 @@ contract codex {
         max_dex_bonus = 5;
         penalty = -1;
         spell_failure = 15;
-        description = "";
+        description = "This armor is made from tough but flexible leather (not hardened leather as with normal leather armor) reinforced with close-set metal rivets.";
     }
 
     function chain_shirt() public pure returns (
@@ -185,7 +185,7 @@ contract codex {
         max_dex_bonus = 4;
         penalty = -3;
         spell_failure = 20;
-        description = "";
+        description = "This armor is prepared from multiple layers of leather and animal hides. It is stiff and hard to move in. Druids, who only wear nonmetallic armor, favor hide.";
     }
 
     function scale_mail() public pure returns (
