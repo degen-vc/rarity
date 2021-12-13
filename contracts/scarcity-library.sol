@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
+import "hardhat/console.sol";
+
 /**
  * @dev Interface of the ERC165 standard, as defined in the
  * https://eips.ethereum.org/EIPS/eip-165[EIP].
@@ -199,6 +201,17 @@ library rl {
         uint32 _int; 
         uint32 _wis; 
         uint32 _cha;
+        _feat_service_data[] feats;
+    }
+
+    struct _feat_service_data {
+        uint id;
+        string name;
+        bool prerequisites;
+        uint prerequisites_feat;
+        uint prerequisites_class;
+        uint prerequisites_level;
+        string benefit;
     }
 
     struct _item_service_data {
@@ -414,6 +427,19 @@ interface codex_items_weapons {
     function item_by_id(uint _id) external pure returns(weapon memory _weapon);
 }
 
+interface feats {
+    function get_feats_by_id(uint _summoner) external view returns (uint[] memory _feats);
+    function feat_by_id(uint _id) external view returns (
+        uint id,
+        string memory name,
+        bool prerequisites,
+        uint prerequisites_feat,
+        uint prerequisites_class,
+        uint prerequisites_level,
+        string memory benefit
+    );
+}
+
 
 contract rarity_library {
     using Strings for uint;
@@ -428,6 +454,7 @@ contract rarity_library {
     codex_items_goods immutable _goods;
     codex_items_armor immutable _armor;
     codex_items_weapons immutable _weapons;
+    feats immutable _feats;
 
     constructor(
         rarity_manifested _rarity_manifested,
@@ -439,7 +466,8 @@ contract rarity_library {
         rarity_names _rarity_names,
         codex_items_goods _codex_items_goods,
         codex_items_armor _codex_items_armor, 
-        codex_items_weapons _codex_items_weapons
+        codex_items_weapons _codex_items_weapons,
+        feats __feats
         ) {
         _rm = _rarity_manifested;
         _attr = _rarity_attributes;
@@ -451,6 +479,7 @@ contract rarity_library {
         _goods = _codex_items_goods;
         _armor = _codex_items_armor;
         _weapons = _codex_items_weapons;
+        _feats = __feats;
     }
 
     function base(uint _s) public view returns (rl._base memory c) {
@@ -614,6 +643,23 @@ contract rarity_library {
         (data.current_skills, data.class_skills) =  currentAndClassSkills(_s);
 
         (data._str, data._dex, data._con, data._int, data._wis, data._cha) = _attr.ability_scores(_s);
+        data.feats = featsServiceData(_s);
+    }
+
+    function featsServiceData(uint _s) public view returns (rl._feat_service_data[] memory featsData) {
+        uint[] memory feats_ids = _feats.get_feats_by_id(_s);
+        rl._feat_service_data[] memory result = new rl._feat_service_data[](feats_ids.length);
+        
+        for (uint i = 0; i < feats_ids.length; i++) {
+            (result[i].id, 
+            result[i].name, 
+            result[i].prerequisites, 
+            result[i].prerequisites_feat, 
+            result[i].prerequisites_class, 
+            result[i].prerequisites_level,
+            result[i].benefit) = _feats.feat_by_id(feats_ids[i]);
+        }
+        return result;
     }
 
     function itemIsTransferred(uint _i) public view returns(bool _transferred) {

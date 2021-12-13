@@ -90,7 +90,7 @@ async function main() {
   await daycare_manager.deployed();
   
   const Library = await hardhat.ethers.getContractFactory('contracts/scarcity-library.sol:rarity_library');
-  const library = await Library.deploy(scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, namesV3.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address);
+  const library = await Library.deploy(scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, namesV3.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address, feats.address);
   await library.deployed();
 
   const ProxyAdmin = await hardhat.ethers.getContractFactory('contracts/market/ProxyAdmin.sol:ProxyAdminImpl');
@@ -158,7 +158,7 @@ async function main() {
     await hardhat.run("verify:verify", {address: '${wrapped_gold.address}', constructorArguments: ['${scarcity.address}', '${gold.address}']});
     await hardhat.run("verify:verify", {address: '${adventure_time.address}', constructorArguments: ['${scarcity.address}']});
     await hardhat.run("verify:verify", {address: '${daycare_manager.address}', constructorArguments: ['${adventure_time.address}']});
-    await hardhat.run("verify:verify", {address: '${library.address}', constructorArguments: ['${scarcity.address}', '${attributes.address}', '${skills.address}', '${gold.address}', '${materials.address}', '${crafting.address}', '${namesV3.address}', '${codex_items_goods.address}', '${codex_items_armor.address}', '${codex_items_weapons.address}']});
+    await hardhat.run("verify:verify", {address: '${library.address}', constructorArguments: ['${scarcity.address}', '${attributes.address}', '${skills.address}', '${gold.address}', '${materials.address}', '${crafting.address}', '${namesV3.address}', '${codex_items_goods.address}', '${codex_items_armor.address}', '${codex_items_weapons.address}', '${feats.address}']});
     await hardhat.run("verify:verify", {address: '${proxyAdmin.address}', contract: 'contracts/market/ProxyAdmin.sol:ProxyAdminImpl'});
     await hardhat.run("verify:verify", {address: '${marketLogic.address}', contract: 'contracts/market/ScarcityCraftingIMarket.sol:RarityCraftingIMarket'});
     await hardhat.run("verify:verify", {address: '${proxyMarket.address}', constructorArguments: ['${marketLogic.address}', '${proxyAdmin.address}', '${data}'], contract: 'contracts/market/ScarcityCraftingIMarketProxy.sol:RarityCraftingIMarketProxy'});
@@ -185,7 +185,7 @@ async function main() {
   await hardhat.run("verify:verify", {address: wrapped_gold.address, constructorArguments: [scarcity.address, gold.address]});
   await hardhat.run("verify:verify", {address: adventure_time.address, constructorArguments: [scarcity.address]});
   await hardhat.run("verify:verify", {address: daycare_manager.address, constructorArguments: [adventure_time.address]});
-  await hardhat.run("verify:verify", {address: library.address, constructorArguments: [scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, namesV3.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address]});
+  await hardhat.run("verify:verify", {address: library.address, constructorArguments: [scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, namesV3.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address, feats.address]});
   await hardhat.run("verify:verify", {address: proxyAdmin.address, contract: 'contracts/market/ProxyAdmin.sol:ProxyAdminImpl'});
   await hardhat.run("verify:verify", {address: marketLogic.address, contract: 'contracts/market/ScarcityCraftingIMarket.sol:RarityCraftingIMarket'});
   await hardhat.run("verify:verify", {address: proxyMarket.address, constructorArguments: [marketLogic.address, proxyAdmin.address, data], contract: 'contracts/market/ScarcityCraftingIMarketProxy.sol:RarityCraftingIMarketProxy'});

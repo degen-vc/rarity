@@ -63,8 +63,17 @@ describe('scarcity-library', function() {
     const Names = await ethers.getContractFactory('contracts/core/namesv2.sol:rarity_names');
     names = await Names.deploy(scarcity.address, gold.address, names_keeper_id);
 
+    const Codex_feats_1 = await ethers.getContractFactory('contracts/codex/codex-feats-1.sol:codex');
+    codex_feats_1 = await Codex_feats_1.deploy();
+
+    const Codex_feats_2 = await ethers.getContractFactory('contracts/codex/codex-feats-2.sol:codex');
+    codex_feats_2 = await Codex_feats_2.deploy();
+
+    const Feats = await ethers.getContractFactory('contracts/core/feats.sol:rarity_feats');
+    feats = await Feats.deploy(scarcity.address, codex_feats_1.address, codex_feats_2.address);
+
     const Library = await ethers.getContractFactory('contracts/scarcity-library.sol:rarity_library');
-    library = await Library.deploy(scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, names.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address);
+    library = await Library.deploy(scarcity.address, attributes.address, skills.address, gold.address, materials.address, crafting.address, names.address, codex_items_goods.address, codex_items_armor.address, codex_items_weapons.address, feats.address);
 
     await ganache.snapshot();
   });
@@ -112,6 +121,7 @@ describe('scarcity-library', function() {
     expect(data._int).to.equal(0);
     expect(data._wis).to.equal(0);
     expect(data._cha).to.equal(0);
+    expect(data.feats.length).to.equal(0);
   });
 
   it('should return right service data for upgraded summoner', async ()=> {
@@ -139,6 +149,7 @@ describe('scarcity-library', function() {
     await gold.connect(receiver).approve(summon_id, executor_id, name_price);
     await scarcity.connect(receiver).approve(names.address, summon_id);
     await names.connect(receiver).claim('testname', summon_id);    
+    await feats.connect(receiver).setup_class(summon_id);
 
     data = await library.summonerServiceData(summon_id);
     expect(data.goldBalance).to.equal(utils.parseEther('800'));
@@ -156,6 +167,8 @@ describe('scarcity-library', function() {
     expect(data._int).to.equal(22);
     expect(data._wis).to.equal(8);
     expect(data._cha).to.equal(8);
+    expect(data.feats.length).to.equal(6);
+    expect(data.feats[5].benefit).to.equal('You can use a shield and take only the standard penalties.');
   });
 
   it('should return right service data for crafted item(goods)', async ()=> {
